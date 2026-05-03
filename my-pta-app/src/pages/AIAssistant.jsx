@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
+import apiClient from "../api/client"; 
 
 
 export default function AIAssistant() {
@@ -17,38 +18,66 @@ export default function AIAssistant() {
   ]);
 
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
 
-    // Add user message
-    const newMessages = [
-      ...messages,
+    const userMessage = input;
+
+    // Add user message instantly
+    setMessages((prev) => [
+      ...prev,
       {
         sender: "user",
-        name: "Sophia",
-        avatar:
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuByWBF-VTHuBEr2v4rI0bS34Yh5BJRRAndcEr7Zp_ivhnXIaBQuCyoYwPLkbYgsLHgpYDP59Roi3kLd5BnAJ57bHp_Duk31IIfiANO8SAkMezi68Ur8pD3wbEPzY8euBXgoV-AViKD3T3ECOB52Mkd1ibh1bh1Kgt2qwALd5CpKjIbd46I8bnfbdzFRcbTZ04GIza6iXbGtdZ2pe6ecrwOjsHfHSeVDaa4oh6435DBeOMn-sKSKSp48SrrmJQ3Hy6XeSuuyeJ5a68TL",
-        text: input,
+        name: "You",
+        avatar: "https://via.placeholder.com/40",
+        text: userMessage,
       },
-    ];
-    setMessages(newMessages);
+    ]);
 
     setInput("");
+    setLoading(true);
 
-    // Simulate AI reply
-    setTimeout(() => {
+    try {
+      const response = await apiClient.post("/ai/chat", {
+        message: userMessage,
+        context: {}, // you can expand later
+      });
+
+      const aiData = response.data;
+
+      // Add AI response
       setMessages((prev) => [
         ...prev,
         {
           sender: "ai",
-          name: "AI Assistant",
+          name: "EveAI",
           avatar:
             "https://lh3.googleusercontent.com/aida-public/AB6AXuBCprEsQdbvsdthaFWr6ABill29X_6spHPtScN1OztBYs_mU0ECBaTYoAsZn2Kh1zwFK5ApIejqE6e9U7sbhITPgg4MwTI5wZWkTuDCO2S39X3e8RXCy8dKWkdmh9sPGhwRre3fc42lVRcf8xlH9b9wrfhtP_FMP3-hvr7-qDA38T0Ryo_nZYJIBh6nczd-80XDLyW85hGnaItaOqF4zckZzoSADTC1ySHYrP4k4gtsJsiC59Q79SNc4JOvdXZgqQwOumiQtPoJVB55",
-          text: "Got it! Let me explain...",
+          text: aiData.response,
         },
       ]);
-    }, 1200);
+
+      // Set suggestions from backend
+      setSuggestions(aiData.suggestions || []);
+
+    } catch (err) {
+      console.error("AI Error:", err);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          name: "EveAI",
+          avatar: "",
+          text: "Something went wrong. Please try again.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -158,6 +187,11 @@ export default function AIAssistant() {
                   )}
                 </div>
               ))}
+              {loading && (
+                <div className="p-4 text-sm text-gray-500">
+                  EveAI is typing...
+                </div>
+              )}
             </div>
 
             {/* Input Box */}
@@ -180,15 +214,13 @@ export default function AIAssistant() {
 
             {/* Suggestions */}
             <div className="flex gap-3 p-3 flex-wrap pr-4">
-              {[
-                "That's a great explanation!",
-                "Tell me more about chlorophyll.",
-                "How does this relate to plant growth?",
-              ].map((s, i) => (
+              {suggestions.map((s, i) => (
                 <div
                   key={i}
                   className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-[#e9eaf2] px-4 cursor-pointer hover:bg-[#dfe0eb]"
-                  onClick={() => setInput(s)}
+                  onClick={() => {
+                    setInput(s);
+                  }}
                 >
                   <p className="text-[#0f111a] text-sm font-medium">{s}</p>
                 </div>
