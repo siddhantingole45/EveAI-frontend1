@@ -1,6 +1,5 @@
 import React from "react";
-// Import React Router components for routing
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const SingleNote = () => {
     // Note data to be displayed. In a real application, this would come from a database or API.

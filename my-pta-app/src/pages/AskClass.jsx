@@ -1,14 +1,18 @@
 import React, { useState } from "react";
-// Import React Router components for routing
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-// The original AskClass component, now placed inside the main App component.
 const AskClass = () => {
     // Initialize state variable for the selected class
     const [selectedClass, setSelectedClass] = useState("");
     
     // The useNavigate hook must be used inside a component that is a child of a <Router>.
     const navigate = useNavigate();
+
+    // Inside handleContinue
+    const handleContinue = () => {
+        localStorage.setItem("onboard_class", selectedClass);
+        navigate("/ask-subjects");
+    };
 
     return (
         <div
@@ -82,7 +86,8 @@ const AskClass = () => {
                         <div className="flex px-4 py-3 justify-center">
                             <button 
                                 className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#607afb] text-[#f8f9fc] text-sm font-bold leading-normal tracking-[0.015em]" 
-                                onClick={() => navigate("/ask-subjects")}
+                                // onClick={() => navigate("/ask-subjects")}
+                                onClick={handleContinue}
                             >
                                 <span className="truncate">Continue</span>
                             </button>

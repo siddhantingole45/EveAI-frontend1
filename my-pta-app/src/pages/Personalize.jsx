@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-// Import React Router components for routing
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import apiClient from "../api/client";
 
 const Personalize = () => {
     // State to manage selected hobbies
@@ -14,6 +14,39 @@ const Personalize = () => {
     const [breakTime, setBreakTime] = useState(30);
 
     const navigate = useNavigate();
+
+    const handleComplete = async () => {
+        const rawSubjects = JSON.parse(localStorage.getItem("onboard_subjects") || "[]");
+        
+        const payload = {
+            subjects: rawSubjects.map(s => ({
+                name: s,
+                priority: 5,
+                level: "beginner",
+                topics: []
+            })),
+            hobbies: selectedHobbies.map(h => ({
+                name: h,
+                proficiency: "beginner"
+            })),
+            availability: {
+                "Monday": [{ start: "09:00", end: "17:00" }], // Defaulting for now
+                "Tuesday": [{ start: "09:00", end: "17:00" }]
+            },
+            preferences: {
+                study_time: studyTime,
+                hobby_time: hobbyTime,
+                break_time: breakTime
+            }
+        };
+
+        try {
+            await apiClient.post("/user/onboard", payload);
+            navigate("/dashboard");
+        } catch {
+            alert("Failed to save profile. Check console.");
+        }
+    };
 
     // List of predefined hobbies.
     const initialHobbies = [
@@ -263,7 +296,8 @@ const Personalize = () => {
 
                         {/* Complete Button */}
                         <div className="flex px-4 py-3 justify-center">
-                            <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-[#607afb] text-[#f8f9fc] text-base font-bold leading-normal tracking-[0.015em]" onClick={() => navigate("/dashboard")}>
+                            <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-[#607afb] text-[#f8f9fc] text-base font-bold leading-normal tracking-[0.015em]"
+                                onClick={handleComplete}>
                                 <span className="truncate">Complete Onboarding</span>
                             </button>
                         </div>

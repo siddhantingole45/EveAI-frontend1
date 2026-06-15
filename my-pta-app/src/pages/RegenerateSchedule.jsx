@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-// Import React Router components for routing
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const RegenerateSchedule = () => {
     // State for the study-hobby balance slider

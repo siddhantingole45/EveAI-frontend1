@@ -9,7 +9,6 @@ const SignUp = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [selectedAvatar, setSelectedAvatar] = useState(null);
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 

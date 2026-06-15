@@ -1,15 +1,34 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import apiClient from "../api/client";
 
 const AddNote = () => {
-    // State to handle note inputs
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
     const [content, setContent] = useState("");
     const [subject, setSubject] = useState("");
-    const [img, setImg] = useState("");
+    const [img, setImg] = useState(null);
 
     const navigate = useNavigate();
+
+    const handleSave = async () => {
+        if (!title || !content) return alert("Title and Content are required");
+        
+        try {
+            const payload = {
+                title,
+                content,
+                subject,
+                tags: [],
+                is_public: false
+            };
+            await apiClient.post("/notes/add", payload);
+            navigate("/notes");
+        } catch (err) {
+            console.error(err);
+            alert("Error saving note");
+        }
+    };
 
     // A list of subjects for the dropdown
     const subjects = ["Math", "Science", "History", "English", "Art"];
@@ -163,7 +182,8 @@ const AddNote = () => {
 
                         {/* Save Button */}
                         <div className="flex px-4 py-3 justify-end">
-                            <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#607afb] text-[#f8f9fc] text-sm font-bold leading-normal tracking-[0.015em]" onClick={() => navigate("/notes")}>
+                            <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#607afb] text-[#f8f9fc] text-sm font-bold leading-normal tracking-[0.015em]"
+                                onClick={handleSave}>
                                 <span className="truncate">Save</span>
                             </button>
                         </div>

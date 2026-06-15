@@ -1,27 +1,24 @@
 import React, { useState } from "react";
-// Import React Router components for routing
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-// The original AskSubjects component, now placed inside the main App component.
 const AskSubjects = () => {
-    // Initialize state variable for the selected subjects
     const [selectedSubjects, setSelectedSubjects] = useState([]);
     const subjects = ["Math", "Science", "History", "English", "Geography"];
-
-    // The useNavigate hook must be used inside a component that is a child of a <Router>.
     const navigate = useNavigate();
 
-    // Function to handle clicking on a subject button
+    const handleNext = () => {
+        localStorage.setItem("onboard_subjects", JSON.stringify(selectedSubjects));
+        navigate("/personalize");
+    };
+
     const handleSubjectClick = (subject) => {
-        // Check if the subject is already in the selectedSubjects array
         if (selectedSubjects.includes(subject)) {
-            // If it is, remove it (deselect)
-            setSelectedSubjects(selectedSubjects.filter(s => s !== subject));
+            setSelectedSubjects(selectedSubjects.filter((s) => s !== subject));
         } else {
-            // If it's not, add it (select)
             setSelectedSubjects([...selectedSubjects, subject]);
         }
     };
+
 
     return (
         <div
@@ -71,28 +68,26 @@ const AskSubjects = () => {
 
                         {/* Subject options */}
                         <div className="flex gap-3 p-3 flex-wrap pr-4 justify-between">
-                            {subjects.map(
-                                (subject) => (
-                                    <button
-                                        key={subject}
-                                        className={`flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 cursor-pointer ${
-                                            selectedSubjects.includes(subject)
-                                                ? 'bg-[#607afb] text-[#f8f9fc]'
-                                                : 'bg-[#e6e9f4] text-[#0d0f1c]'
-                                        }`}
-                                        onClick={() => handleSubjectClick(subject)}
-                                    >
-                                        <p className="text-sm font-medium leading-normal">{subject}</p>
-                                    </button>
-                                )
-                            )}
+                            {subjects.map((subject) => (
+                                <button
+                                    key={subject}
+                                    className={`flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 cursor-pointer ${
+                                        selectedSubjects.includes(subject)
+                                            ? 'bg-[#607afb] text-[#f8f9fc]'
+                                            : 'bg-[#e6e9f4] text-[#0d0f1c]'
+                                    }`}
+                                    onClick={() => handleSubjectClick(subject)}
+                                >
+                                    <p className="text-sm font-medium leading-normal">{subject}</p>
+                                </button>
+                            ))}
                         </div>
 
                         {/* Button */}
                         <div className="flex px-4 py-3 justify-center">
                             <button 
                                 className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#607afb] text-[#f8f9fc] text-sm font-bold leading-normal tracking-[0.015em]" 
-                                onClick={() => navigate("/personalize")}
+                                onClick={handleNext}
                             >
                                 <span className="truncate">Next</span>
                             </button>
