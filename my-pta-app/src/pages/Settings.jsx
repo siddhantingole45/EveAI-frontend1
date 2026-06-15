@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../api/client";
+import { useEffect } from "react";
 
 const Settings = () => {
   const [name, setName] = useState("John Doe");
@@ -64,6 +66,77 @@ const [selectedHobbies, setSelectedHobbies] = useState(["Reading", "Coding"]);
     } else {
       setSelectedSubjects([...selectedSubjects, subject]);
     }
+  };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await apiClient.get("/user/profile");
+        const data = res.data;
+
+        setSelectedSubjects(data.subjects.map(s => s.name));
+        setSelectedHobbies(data.hobbies.map(h => h.name));
+
+        setFocusTime(data.preferences?.focus_time || "");
+      } catch (err) {
+        console.log("No profile yet, user is new" + err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await apiClient.get("/user/me");
+        setName(res.data.name);
+        setEmail(res.data.email);
+      } catch (err) {
+        console.error("Failed to load user" + err);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const buildPayload = () => {
+    return {
+      subjects: selectedSubjects.map((s) => ({
+        name: s,
+        priority: 5,
+        level: "beginner",
+        topics: [],
+      })),
+      hobbies: selectedHobbies.map((h) => ({
+        name: h,
+        description: "",
+        proficiency: "beginner",
+      })),
+      availability: {},
+      preferences: {
+        focus_time: focusTime,
+      },
+    };
+  };
+
+  const handleSave = async () => {
+    try {
+      const payload = buildPayload();
+
+      await apiClient.post("/user/onboard", payload);
+
+      alert("Profile saved successfully!");
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save profile");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    navigate("/login");
   };
 
   return (
@@ -252,13 +325,13 @@ const [selectedHobbies, setSelectedHobbies] = useState(["Reading", "Coding"]);
             <div className="flex justify-center gap-6 pt-4">
               <button
                 className="rounded-full h-10 px-6 bg-[#607afb] text-white font-bold hover:bg-[#4e65d8] transition"
-                onClick={() => navigate("/dashboard")}
+                onClick={handleSave}
               >
                 Save
               </button>
               <button
                 className="rounded-full h-10 px-6 bg-[#ff0000] text-white font-bold hover:bg-[#d60000] transition"
-                onClick={() => navigate("/")}
+                onClick={handleLogout}
               >
                 Logout
               </button>
