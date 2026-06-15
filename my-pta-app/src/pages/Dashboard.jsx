@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../api/client";
+import AppShell from "../Components/AppShell";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  // const [user, setUserName] = useState(null);
-  // const [stats, setStats] = useState(null);
-  const [stats, setStats] = useState({ completion_rate: 0, streak_days: 0 });
+  const [stats, setStats] = useState({ completion_rate: 0, streak_days: 0, total_sessions: 0 });
   const [loading, setLoading] = useState(true);
   // const [loading] = useState(true);
 
@@ -47,40 +46,25 @@ export default function Dashboard() {
   if (loading) return <div className="flex h-screen items-center justify-center">Loading Dashboard...</div>;
 
   return (
-    <div className="relative flex size-full min-h-screen flex-col bg-[#f9f9fb] overflow-x-hidden">
-      <div className="layout-container flex h-full grow flex-col">
-        {/* Simplified Header for brevity, same as your design */}
-        <header className="flex items-center justify-between border-b border-[#e9eaf2] px-10 py-3">
-           <div className="flex items-center gap-4 text-[#0f111a] font-bold">EveAI</div>
-           <div onClick={() => navigate("/settings")} className="cursor-pointer size-10 rounded-full bg-blue-100 flex items-center justify-center">
-             {user?.name?.charAt(0)}
-           </div>
-        </header>
-
-        <div className="px-10 md:px-40 flex flex-1 justify-center py-5">
-          <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-            <div className="p-4">
-              <h1 className="text-[#0f111a] text-[32px] font-bold">Welcome back, {user?.name}!</h1>
-              <p className="text-[#56618f] text-sm">Here's your learning progress.</p>
-            </div>
-
-            <div className="flex flex-wrap gap-4 p-4">
-              <StatCard title="Completion Rate" value={`${stats?.completion_rate}%`} trend="+2%" color="text-green-600" />
-              <StatCard title="Current Streak" value={`${stats?.streak_days} Days`} trend="+1" color="text-green-600" />
-              <StatCard title="Total Sessions" value={stats?.total_sessions} trend="Global" color="text-blue-600" />
-            </div>
-
-            <h2 className="text-[22px] font-bold px-4 pt-5">Quick Actions</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
-              <ActionButton label="Ask AI" icon="🤖" onClick={() => navigate("/assistant")} />
-              <ActionButton label="My Notes" icon="📝" onClick={() => navigate("/notes")} />
-              <ActionButton label="Schedule" icon="📅" onClick={() => navigate("/schedule")} />
-              <ActionButton label="Quizzes" icon="💡" onClick={() => navigate("/practice-quiz")} />
-            </div>
+    <AppShell title={`Welcome back, ${user?.name || "Student"}!`}>
+      <div className="space-y-6">
+        <div className="rounded-3xl border border-[#dfe3ee] bg-white p-6 shadow-sm">
+          <p className="text-[#56618f] text-sm">Here's your learning progress.</p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <StatCard title="Completion Rate" value={`${stats?.completion_rate}%`} trend="+2%" color="text-green-600" />
+            <StatCard title="Current Streak" value={`${stats?.streak_days} Days`} trend="+1" color="text-green-600" />
+            <StatCard title="Total Sessions" value={stats?.total_sessions || 0} trend="Global" color="text-blue-600" />
           </div>
         </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <ActionButton label="Ask AI" icon="🤖" onClick={() => navigate("/assistant")} />
+          <ActionButton label="My Notes" icon="📝" onClick={() => navigate("/notes")} />
+          <ActionButton label="Schedule" icon="📅" onClick={() => navigate("/schedule")} />
+          <ActionButton label="Quizzes" icon="💡" onClick={() => navigate("/practice-quiz")} />
+        </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
 

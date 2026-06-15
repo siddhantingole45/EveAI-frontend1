@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import AppShell from "../Components/AppShell";
 
 const Subject = () => {
   const navigate = useNavigate();
@@ -97,7 +98,7 @@ const Subject = () => {
                   key={idx}
                   className="flex flex-col rounded-xl p-4 bg-white shadow-md cursor-pointer transition-transform hover:scale-105"
                   // onClick={() => navigate(`/subject/${subject.name.toLowerCase()}`)}
-                  onClick={() => navigate("/subjects/single-subject")}
+                  onClick={() => navigate("/subjects/detail")}
                 >
                   <div className="relative mb-4 overflow-hidden rounded-lg w-full h-32">
                     <img

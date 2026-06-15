@@ -1,23 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../api/client";
-import { useEffect } from "react";
+import AppShell from "../Components/AppShell";
 
 const Settings = () => {
   const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("john.doe@example.com");
   const [selectedSubjects, setSelectedSubjects] = useState(["Math", "Science"]);
   const [focusTime, setFocusTime] = useState("");
-  // State to manage selected hobbies
-const [selectedHobbies, setSelectedHobbies] = useState(["Reading", "Coding"]);
-  // State for the custom hobby input field
+  const [selectedHobbies, setSelectedHobbies] = useState(["Reading", "Coding"]);
   const [customHobby, setCustomHobby] = useState("");
-
-
-  const subjects = ["Math", "Science", "History", "English", "Geography"];
   const navigate = useNavigate();
 
-  // List of predefined hobbies.
+  const subjects = ["Math", "Science", "History", "English", "Geography"];
   const initialHobbies = [
     { name: "Reading", icon: "📚", isCustom: false },
     { name: "Writing", icon: "✍️", isCustom: false },
@@ -29,35 +24,29 @@ const [selectedHobbies, setSelectedHobbies] = useState(["Reading", "Coding"]);
     { name: "Gaming", icon: "🎮", isCustom: false },
     { name: "Sports", icon: "🏈", isCustom: false },
   ];
-  // New state to hold all hobbies, including custom ones
   const [allHobbies, setAllHobbies] = useState(initialHobbies);
 
-  // Function to handle adding or removing a hobby from the state
   const handleHobbyClick = (hobbyName) => {
     if (selectedHobbies.includes(hobbyName)) {
-      setSelectedHobbies(selectedHobbies.filter(name => name !== hobbyName));
+      setSelectedHobbies(selectedHobbies.filter((name) => name !== hobbyName));
     } else {
       setSelectedHobbies([...selectedHobbies, hobbyName]);
     }
   };
 
-  // Function to handle adding a custom hobby
   const handleAddCustomHobby = () => {
-    if (customHobby.trim() !== "" && !allHobbies.some(h => h.name === customHobby.trim())) {
-      // Add the new custom hobby to the allHobbies state
-      const newHobby = { name: customHobby.trim(), icon: "💡", isCustom: true };
+    const trimmed = customHobby.trim();
+    if (trimmed && !allHobbies.some((h) => h.name === trimmed)) {
+      const newHobby = { name: trimmed, icon: "💡", isCustom: true };
       setAllHobbies([...allHobbies, newHobby]);
-      // Also select it by default
-      setSelectedHobbies([...selectedHobbies, customHobby.trim()]);
+      setSelectedHobbies([...selectedHobbies, trimmed]);
       setCustomHobby("");
     }
   };
 
-  // Function to handle deleting a custom hobby
   const handleDeleteHobby = (hobbyName) => {
-    // Remove the hobby from both the main list and the selected list
-    setAllHobbies(allHobbies.filter(h => h.name !== hobbyName));
-    setSelectedHobbies(selectedHobbies.filter(name => name !== hobbyName));
+    setAllHobbies(allHobbies.filter((h) => h.name !== hobbyName));
+    setSelectedHobbies(selectedHobbies.filter((name) => name !== hobbyName));
   };
 
   const handleSubjectClick = (subject) => {
@@ -73,16 +62,13 @@ const [selectedHobbies, setSelectedHobbies] = useState(["Reading", "Coding"]);
       try {
         const res = await apiClient.get("/user/profile");
         const data = res.data;
-
-        setSelectedSubjects(data.subjects.map(s => s.name));
-        setSelectedHobbies(data.hobbies.map(h => h.name));
-
+        setSelectedSubjects(data.subjects.map((s) => s.name));
+        setSelectedHobbies(data.hobbies.map((h) => h.name));
         setFocusTime(data.preferences?.focus_time || "");
       } catch (err) {
-        console.log("No profile yet, user is new" + err);
+        console.log("No profile yet, user is new", err);
       }
     };
-
     fetchProfile();
   }, []);
 
@@ -93,39 +79,22 @@ const [selectedHobbies, setSelectedHobbies] = useState(["Reading", "Coding"]);
         setName(res.data.name);
         setEmail(res.data.email);
       } catch (err) {
-        console.error("Failed to load user" + err);
+        console.error("Failed to load user", err);
       }
     };
-
     fetchUser();
   }, []);
 
-  const buildPayload = () => {
-    return {
-      subjects: selectedSubjects.map((s) => ({
-        name: s,
-        priority: 5,
-        level: "beginner",
-        topics: [],
-      })),
-      hobbies: selectedHobbies.map((h) => ({
-        name: h,
-        description: "",
-        proficiency: "beginner",
-      })),
-      availability: {},
-      preferences: {
-        focus_time: focusTime,
-      },
-    };
-  };
+  const buildPayload = () => ({
+    subjects: selectedSubjects.map((s) => ({ name: s, priority: 5, level: "beginner", topics: [] })),
+    hobbies: selectedHobbies.map((h) => ({ name: h, description: "", proficiency: "beginner" })),
+    availability: {},
+    preferences: { focus_time: focusTime },
+  });
 
   const handleSave = async () => {
     try {
-      const payload = buildPayload();
-
-      await apiClient.post("/user/onboard", payload);
-
+      await apiClient.post("/user/onboard", buildPayload());
       alert("Profile saved successfully!");
       navigate("/dashboard");
     } catch (err) {
@@ -140,206 +109,143 @@ const [selectedHobbies, setSelectedHobbies] = useState(["Reading", "Coding"]);
   };
 
   return (
-    <div
-      className="relative flex size-full min-h-screen flex-col bg-[#f8f9fc] overflow-x-hidden"
-      style={{
-        fontFamily: 'Manrope, "Noto Sans", sans-serif',
-      }}
-    >
-      {/* Layout */}
-      <div className="layout-container flex h-full grow flex-col">
-        {/* Header */}
-        <header className="flex items-center justify-between border-b border-[#e6e9f4] px-10 py-3">
-          <div
-            className="flex items-center gap-4 text-[#0d0f1c] cursor-pointer"
-            onClick={() => navigate("/dashboard")}
-          >
-            <div className="size-4">
-              <svg
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
-                  fill="currentColor"
+    <AppShell title="Settings" hideSearch>
+      <div className="space-y-8">
+        <div className="grid gap-8 rounded-3xl bg-white p-8 shadow-sm md:grid-cols-2">
+          <div className="space-y-4">
+            <p className="text-2xl font-bold text-[#0f111a]">Profile</p>
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-[#0f111a]">
+                Name
+                <input
+                  className="mt-2 w-full rounded-2xl border border-[#d2d6e4] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#607afb] focus:ring-2 focus:ring-[#dbe4ff]"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
-              </svg>
+              </label>
+              <label className="block text-sm font-medium text-[#0f111a]">
+                Email
+                <input
+                  className="mt-2 w-full rounded-2xl border border-[#d2d6e4] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#607afb] focus:ring-2 focus:ring-[#dbe4ff]"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </label>
             </div>
-            <h2 className="text-[#0d0f1c] text-lg font-bold tracking-[-0.015em]">
-              EveAI
-            </h2>
           </div>
-          <div className="flex flex-1 justify-end">
-            <div
-              className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-              style={{
-                backgroundImage:
-                  'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBDTfmrPOzjLT0IneSKmdOJtsqHZD566XOg0x9KMmJB-qad5YZ3G1PBgCH7iQIn8Xi2jVcNW-fKpKX3jMtacgLUDkSbR906_Fp2xHjdkLZ7HQ5frtgNy4hieXGUXF4gf9VjZKTT7UZkkxhekxZYcRkPyFUKTs_aoKBlLPWdOEZQcnQNz6IdxtljqLx7ewL2u7Be-aGMVHQ8u5JE8iTkRxhrN3BsjWHAxu8XYmMs4-sBl0_JwASDb_dUu7pj8_orWNlqr9IqCnSraJSt")',
-              }}
-            ></div>
-          </div>
-        </header>
 
-        {/* Content */}
-        <div className="px-10 flex flex-1 py-8">
-          <div className="layout-content-container flex flex-col w-full max-w-4xl mx-auto gap-8">
-            {/* Title */}
-            <div className="text-center">
-              <p className="text-[#0d0f1c] text-[32px] font-bold">Settings</p>
-            </div>
-
-            {/* Profile Section */}
-            <div className="bg-white rounded-2xl shadow p-6">
-              <h3 className="text-[#0d0f1c] text-lg font-bold mb-4">Profile</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <label className="flex flex-col">
-                  <span className="text-base font-medium pb-2">Name</span>
-                  <input
-                    className="form-input rounded-lg border bg-[#f8f9fc] border-[#ced2e9] h-14 px-4"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </label>
-
-                <label className="flex flex-col">
-                  <span className="text-base font-medium pb-2">Email</span>
-                  <input
-                    className="form-input rounded-lg border bg-[#f8f9fc] border-[#ced2e9] h-14 px-4"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </label>
-
-                <button className="flex justify-between items-center border rounded-xl px-4 h-14 mt-7 bg-[#607afb] text-white hover:bg-[#4e65d8] transition">
-                  <span>Change Password</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20px"
-                    height="20px"
-                    fill="currentColor"
-                    viewBox="0 0 256 256"
-                  >
-                    <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Subjects Section */}
-            <div className="bg-white rounded-2xl shadow p-6">
-              <h3 className="text-lg font-bold mb-4">Subjects</h3>
-              <div className="flex gap-4 flex-wrap justify-center">
-                {subjects.map((subject) => (
-                  <button
-                    key={subject}
-                    className={`flex items-center justify-center rounded-lg px-6 py-2 cursor-pointer transition ${selectedSubjects.includes(subject)
-                      ? "bg-[#607afb] text-white"
-                      : "bg-[#e6e9f4] text-[#0d0f1c]"
-                      }`}
-                    onClick={() => handleSubjectClick(subject)}
-                  >
-                    {subject}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Hobbies Section */}
-<div className="bg-white rounded-2xl shadow p-6">
-  <h3 className="text-lg font-bold mb-4">Select Your Hobbies</h3>
-
-  {/* Hobby Buttons */}
-  <div className="flex gap-3 flex-wrap justify-between">
-    {allHobbies.map((hobby, idx) => (
-      <div key={idx} className="relative">
-        <button
-          className={`flex h-10 items-center justify-center gap-x-2 rounded-lg px-3 cursor-pointer transition-colors duration-200 ${
-            selectedHobbies.includes(hobby.name)
-              ? "bg-[#607afb] text-[#f8f9fc]"
-              : "bg-[#e6e9f4] text-[#0d0f1c]"
-          }`}
-          onClick={() => handleHobbyClick(hobby.name)}
-        >
-          <span className="text-xl">{hobby.icon}</span>
-          <p className="text-sm font-medium">{hobby.name}</p>
-        </button>
-        {hobby.isCustom && (
-          <button
-            className="absolute -top-2 -right-2 size-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs cursor-pointer"
-            onClick={() => handleDeleteHobby(hobby.name)}
-          >
-            &times;
-          </button>
-        )}
-      </div>
-    ))}
-  </div>
-
-  {/* Add Custom Hobby */}
-  <div className="flex max-w-[480px] flex-wrap items-end gap-4 pt-4">
-    <label className="flex flex-col min-w-40 flex-1">
-      <div className="flex items-center">
-        <input
-          placeholder="Add a custom hobby"
-          className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0d0f1c] focus:outline-0 focus:ring-0 border border-[#ced2e9] bg-[#f8f9fc] focus:border-[#ced2e9] h-14 placeholder:text-[#47569e] p-[15px] text-base font-normal"
-          value={customHobby}
-          onChange={(e) => setCustomHobby(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === "Enter") handleAddCustomHobby();
-          }}
-        />
-        <button
-          onClick={handleAddCustomHobby}
-          className="ml-2 flex-shrink-0 px-4 py-2 rounded-lg bg-[#607afb] text-[#f8f9fc] text-sm font-bold"
-        >
-          Add
-        </button>
-      </div>
-    </label>
-  </div>
-</div>
-
-
-            {/* Focus Time */}
-            <div className="bg-white rounded-2xl shadow p-6">
-              <h3 className="text-lg font-bold mb-4">Focus Time</h3>
-              <div className="w-full md:w-1/3">
-                <select
-                  className="form-input w-full rounded-xl border border-[#ced3e9] bg-[#f8f9fc] h-14 px-4"
-                  value={focusTime}
-                  onChange={(e) => setFocusTime(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select Time
-                  </option>
-                  <option value="25">25 mins</option>
-                  <option value="50">50 mins</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex justify-center gap-6 pt-4">
-              <button
-                className="rounded-full h-10 px-6 bg-[#607afb] text-white font-bold hover:bg-[#4e65d8] transition"
-                onClick={handleSave}
-              >
-                Save
-              </button>
-              <button
-                className="rounded-full h-10 px-6 bg-[#ff0000] text-white font-bold hover:bg-[#d60000] transition"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            </div>
+          <div className="flex flex-col justify-between rounded-3xl bg-[#f8fafc] p-6">
+            <p className="text-lg font-semibold text-[#0f111a]">Change Password</p>
+            <button
+              type="button"
+              className="mt-4 rounded-2xl bg-[#607afb] px-5 py-3 text-sm font-semibold text-white hover:bg-[#4d6ce0]"
+            >
+              Change Password
+            </button>
           </div>
         </div>
+
+        <div className="rounded-3xl bg-white p-8 shadow-sm">
+          <p className="text-xl font-bold text-[#0f111a] mb-6">Subjects</p>
+          <div className="flex flex-wrap gap-3">
+            {subjects.map((subject) => (
+              <button
+                key={subject}
+                type="button"
+                onClick={() => handleSubjectClick(subject)}
+                className={`rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+                  selectedSubjects.includes(subject)
+                    ? 'bg-[#607afb] text-white'
+                    : 'bg-[#e6e9f4] text-[#0f111a] hover:bg-[#dbe4ff]'
+                }`}
+              >
+                {subject}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-3xl bg-white p-8 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <p className="text-xl font-bold text-[#0f111a]">Select Your Hobbies</p>
+            <div className="flex w-full max-w-sm gap-2">
+              <input
+                value={customHobby}
+                onChange={(e) => setCustomHobby(e.target.value)}
+                onKeyPress={(e) => { if (e.key === 'Enter') handleAddCustomHobby(); }}
+                placeholder="Add a custom hobby"
+                className="flex-1 rounded-2xl border border-[#d2d6e4] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#607afb] focus:ring-2 focus:ring-[#dbe4ff]"
+              />
+              <button
+                type="button"
+                onClick={handleAddCustomHobby}
+                className="rounded-2xl bg-[#607afb] px-4 py-3 text-sm font-semibold text-white hover:bg-[#4d6ce0]"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {allHobbies.map((hobby, idx) => (
+              <div key={idx} className="relative">
+                <button
+                  type="button"
+                  onClick={() => handleHobbyClick(hobby.name)}
+                  className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-sm transition ${
+                    selectedHobbies.includes(hobby.name)
+                      ? 'border-[#607afb] bg-[#eff4ff] text-[#0f111a]'
+                      : 'border-[#e6e9f4] bg-white text-[#0f111a] hover:bg-[#f8fafc]'
+                  }`}
+                >
+                  <span className="text-lg">{hobby.icon}</span>
+                  <span>{hobby.name}</span>
+                </button>
+                {hobby.isCustom && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteHobby(hobby.name)}
+                    className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-3xl bg-white p-8 shadow-sm">
+          <p className="text-xl font-bold text-[#0f111a] mb-4">Focus Time</p>
+          <select
+            className="w-full max-w-xs rounded-2xl border border-[#d2d6e4] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#607afb] focus:ring-2 focus:ring-[#dbe4ff]"
+            value={focusTime}
+            onChange={(e) => setFocusTime(e.target.value)}
+          >
+            <option value="" disabled>Select Time</option>
+            <option value="25">25 mins</option>
+            <option value="50">50 mins</option>
+          </select>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-4">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="rounded-2xl bg-[#607afb] px-6 py-3 text-sm font-semibold text-white hover:bg-[#4d6ce0]"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-2xl bg-[#ff0000] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d60000]"
+          >
+            Logout
+          </button>
+        </div>
       </div>
-    </div>
+    </AppShell>
   );
 };
 

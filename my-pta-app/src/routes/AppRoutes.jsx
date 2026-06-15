@@ -32,22 +32,23 @@ function AppRoutes() {
         {/* Protected Routes */}
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/schedule" element={<ProtectedRoute><WeeklySchedule /></ProtectedRoute>} />
+        <Route path="/schedule/regenerate" element={<ProtectedRoute><RegenerateSchedule /></ProtectedRoute>} />
         <Route path="/assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
         <Route path="/notes" element={<ProtectedRoute><MyNotes /></ProtectedRoute>} />
-        <Route path="/notes/add-note" element={<ProtectedRoute><AddNote /></ProtectedRoute>} />
-        <Route path="/notes/single-note/:id" element={<ProtectedRoute><SingleNote /></ProtectedRoute>} />
+        <Route path="/notes/new" element={<ProtectedRoute><AddNote /></ProtectedRoute>} />
+        <Route path="/notes/:id" element={<ProtectedRoute><SingleNote /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
-        {/* NOTE: Check these again */}
-        <Route path="/ask-class" element={<AskClass />} />
-        <Route path="/ask-subjects" element={<AskSubjects />} />
-        <Route path="/personalize" element={<Personalize />} />
-        <Route path="/regenerate-schedule" element={<RegenerateSchedule />} />
-        <Route path="/practice-quiz" element={<PracticeQuiz />} />
-        <Route path="/quiz" element={<Quiz />} />
-        <Route path="/insights" element={<ProjectInsights />} />
-        <Route path="/subjects" element={<Subjects />} />
-        <Route path="/subjects/single-subject" element={<SingleSubject />} />
+        {/* Onboarding / Learning flow */}
+        <Route path="/onboarding/class" element={<AskClass />} />
+        <Route path="/onboarding/subjects" element={<AskSubjects />} />
+        <Route path="/onboarding/preferences" element={<Personalize />} />
+        <Route path="/practice-quiz" element={<ProtectedRoute><PracticeQuiz /></ProtectedRoute>} />
+        <Route path="/quiz" element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
+        <Route path="/insights" element={<ProtectedRoute><ProjectInsights /></ProtectedRoute>} />
+        <Route path="/subjects" element={<ProtectedRoute><Subjects /></ProtectedRoute>} />
+        <Route path="/subjects/detail" element={<ProtectedRoute><SingleSubject /></ProtectedRoute>} />
+        <Route path="*" element={<Landing />} />
       </Routes>
     </Router>
   );

@@ -8,7 +8,7 @@ const AskSubjects = () => {
 
     const handleNext = () => {
         localStorage.setItem("onboard_subjects", JSON.stringify(selectedSubjects));
-        navigate("/personalize");
+        navigate("/onboarding/preferences");
     };
 
     const handleSubjectClick = (subject) => {

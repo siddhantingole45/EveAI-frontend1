@@ -11,7 +11,7 @@ const AskClass = () => {
     // Inside handleContinue
     const handleContinue = () => {
         localStorage.setItem("onboard_class", selectedClass);
-        navigate("/ask-subjects");
+        navigate("/onboarding/subjects");
     };
 
     return (

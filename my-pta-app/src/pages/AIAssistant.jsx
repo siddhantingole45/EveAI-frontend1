@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import apiClient from "../api/client";
+import AppShell from "../Components/AppShell";
 
 export default function AIAssistant() {
   const [messages, setMessages] = useState([
@@ -16,48 +17,57 @@ export default function AIAssistant() {
   const handleSend = async () => {
     if (!input.trim()) return;
     const userMsg = input;
-    setMessages(prev => [...prev, { sender: "user", text: userMsg }]);
+    setMessages((prev) => [...prev, { sender: "user", text: userMsg }]);
     setInput("");
     setLoading(true);
 
     try {
       const res = await apiClient.post("/ai/chat", { message: userMsg });
-      setMessages(prev => [...prev, { sender: "ai", text: res.data.response }]);
+      setMessages((prev) => [...prev, { sender: "ai", text: res.data.response }]);
     } catch {
-      setMessages(prev => [...prev, { sender: "ai", text: "I'm having trouble connecting to my brain. Try again?" }]);
+      setMessages((prev) => [...prev, { sender: "ai", text: "I'm having trouble connecting to my brain. Try again?" }]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
-      <header className="p-6 border-b font-bold text-xl">EveAI Tutor</header>
-      
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.sender === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[70%] p-4 rounded-2xl ${
-              m.sender === "user" ? "bg-blue-600 text-white rounded-tr-none" : "bg-gray-100 text-gray-800 rounded-tl-none"
-            }`}>
-              {m.text}
+    <AppShell title="EveAI Tutor" hideSearch>
+      <div className="flex min-h-[60vh] flex-col gap-6 rounded-3xl bg-white p-6 shadow-sm">
+        <div className="flex-1 space-y-4 overflow-y-auto">
+          {messages.map((message, index) => (
+            <div key={index} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
+              <div className={`max-w-[75%] rounded-3xl p-4 text-sm leading-relaxed ${
+                message.sender === "user"
+                  ? "bg-blue-600 text-white rounded-tr-none"
+                  : "bg-[#f3f4f6] text-[#111827] rounded-tl-none"
+              }`}>
+                {message.text}
+              </div>
             </div>
-          </div>
-        ))}
-        {loading && <div className="text-gray-400 text-sm animate-pulse">Eve is thinking...</div>}
-        <div ref={scrollRef} />
-      </div>
+          ))}
+          {loading && <div className="text-sm text-[#6b7280]">Eve is thinking...</div>}
+          <div ref={scrollRef} />
+        </div>
 
-      <div className="p-6 border-t flex gap-4">
-        <input 
-          className="flex-1 border rounded-xl px-4 py-3 focus:outline-blue-500"
-          placeholder="Ask anything (e.g. Explain photosynthesis using a football analogy)"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-        />
-        <button onClick={handleSend} className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold">Send</button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <input
+            type="text"
+            placeholder="Ask anything (e.g. Explain photosynthesis using a football analogy)"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            className="flex-1 rounded-2xl border border-[#d2d6e4] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#607afb] focus:ring-2 focus:ring-[#dbe4ff]"
+          />
+          <button
+            type="button"
+            onClick={handleSend}
+            className="rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+          >
+            Send
+          </button>
+        </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
