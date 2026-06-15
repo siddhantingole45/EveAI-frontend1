@@ -1,311 +1,221 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../api/client";
 
+const initialHobbies = [
+  { name: "Reading", icon: "📚", isCustom: false },
+  { name: "Writing", icon: "✍️", isCustom: false },
+  { name: "Coding", icon: "💻", isCustom: false },
+  { name: "Art", icon: "🎨", isCustom: false },
+  { name: "Music", icon: "🎵", isCustom: false },
+  { name: "Travel", icon: "✈️", isCustom: false },
+  { name: "Cooking", icon: "🍳", isCustom: false },
+  { name: "Gaming", icon: "🎮", isCustom: false },
+  { name: "Sports", icon: "🏈", isCustom: false },
+];
+
 const Personalize = () => {
-    // State to manage selected hobbies
-    const [selectedHobbies, setSelectedHobbies] = useState([]);
-    // State for the custom hobby input field
-    const [customHobby, setCustomHobby] = useState("");
-    
-    // States for the time commitment sliders (in minutes)
-    const [studyTime, setStudyTime] = useState(120);
-    const [hobbyTime, setHobbyTime] = useState(60);
-    const [breakTime, setBreakTime] = useState(30);
+  const [selectedHobbies, setSelectedHobbies] = useState([]);
+  const [allHobbies, setAllHobbies] = useState(initialHobbies);
+  const [customHobby, setCustomHobby] = useState("");
+  const [studyTime, setStudyTime] = useState(120);
+  const [hobbyTime, setHobbyTime] = useState(60);
+  const [breakTime, setBreakTime] = useState(30);
+  const [error, setError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleComplete = async () => {
-        const rawSubjects = JSON.parse(localStorage.getItem("onboard_subjects") || "[]");
-        
-        const payload = {
-            subjects: rawSubjects.map(s => ({
-                name: s,
-                priority: 5,
-                level: "beginner",
-                topics: []
-            })),
-            hobbies: selectedHobbies.map(h => ({
-                name: h,
-                proficiency: "beginner"
-            })),
-            availability: {
-                "Monday": [{ start: "09:00", end: "17:00" }], // Defaulting for now
-                "Tuesday": [{ start: "09:00", end: "17:00" }]
-            },
-            preferences: {
-                study_time: studyTime,
-                hobby_time: hobbyTime,
-                break_time: breakTime
-            }
-        };
+  const formatTime = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const remainder = minutes % 60;
+    return `${hours > 0 ? `${hours}h ` : ""}${remainder}m`;
+  };
 
-        try {
-            await apiClient.post("/user/onboard", payload);
-            navigate("/dashboard");
-        } catch {
-            alert("Failed to save profile. Check console.");
-        }
-    };
-
-    // List of predefined hobbies.
-    const initialHobbies = [
-        { name: "Reading", icon: "📚", isCustom: false },
-        { name: "Writing", icon: "✍️", isCustom: false },
-        { name: "Coding", icon: "💻", isCustom: false },
-        { name: "Art", icon: "🎨", isCustom: false },
-        { name: "Music", icon: "🎵", isCustom: false },
-        { name: "Travel", icon: "✈️", isCustom: false },
-        { name: "Cooking", icon: "🍳", isCustom: false },
-        { name: "Gaming", icon: "🎮", isCustom: false },
-        { name: "Sports", icon: "🏈", isCustom: false },
-    ];
-    // New state to hold all hobbies, including custom ones
-    const [allHobbies, setAllHobbies] = useState(initialHobbies);
-    
-    // Function to handle adding or removing a hobby from the state
-    const handleHobbyClick = (hobbyName) => {
-        if (selectedHobbies.includes(hobbyName)) {
-            setSelectedHobbies(selectedHobbies.filter(name => name !== hobbyName));
-        } else {
-            setSelectedHobbies([...selectedHobbies, hobbyName]);
-        }
-    };
-    
-    // Function to handle adding a custom hobby
-    const handleAddCustomHobby = () => {
-        if (customHobby.trim() !== "" && !allHobbies.some(h => h.name === customHobby.trim())) {
-            // Add the new custom hobby to the allHobbies state
-            const newHobby = { name: customHobby.trim(), icon: "💡", isCustom: true };
-            setAllHobbies([...allHobbies, newHobby]);
-            // Also select it by default
-            setSelectedHobbies([...selectedHobbies, customHobby.trim()]);
-            setCustomHobby("");
-        }
-    };
-
-    // Function to handle deleting a custom hobby
-    const handleDeleteHobby = (hobbyName) => {
-        // Remove the hobby from both the main list and the selected list
-        setAllHobbies(allHobbies.filter(h => h.name !== hobbyName));
-        setSelectedHobbies(selectedHobbies.filter(name => name !== hobbyName));
-    };
-
-    // Function to handle slider value changes based on click position
-    const handleSliderChange = (e, setTimeState, maxTime) => {
-        const slider = e.currentTarget;
-        const rect = slider.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const newTime = Math.round((clickX / rect.width) * maxTime);
-        // Round to nearest 15 minutes for a smoother experience
-        setTimeState(Math.round(newTime / 15) * 15);
-    };
-
-    // Function to format minutes to hours and minutes
-    const formatTime = (totalMinutes) => {
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        if (hours > 0 && minutes > 0) return `${hours}h ${minutes}m`;
-        if (hours > 0) return `${hours}h`;
-        return `${minutes}m`;
-    };
-
-    return (
-        <div
-            className="relative flex size-full min-h-screen flex-col bg-[#f8f9fc] group/design-root overflow-x-hidden"
-            style={{ fontFamily: 'Manrope, "Noto Sans", sans-serif' }}
-        >
-            <div className="layout-container flex h-full grow flex-col">
-                {/* Header */}
-                <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e6e9f4] px-10 py-3">
-                    <div className="flex items-center gap-4 text-[#0d0f1c]">
-                        <div className="size-4">
-                            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"
-                                    fill="currentColor"
-                                ></path>
-                            </svg>
-                        </div>
-                        <h2 className="text-[#0d0f1c] text-lg font-bold leading-tight tracking-[-0.015em]">
-                            EveAI
-                        </h2>
-                    </div>
-
-                    <div className="flex flex-1 justify-end gap-8">
-                        <div
-                            className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                            style={{
-                                backgroundImage:
-                                    'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2SESxQrfjL1yt_apW8lKQiO8OVWpHFW5138lj8R9l72ZPTUPMCEj2V6bKI6ntltf6vORR_PpbnDXPdYntx8RRLWVWtK6nEVSie8lgZvVdnyY0ZEwvyJKUROu2bDloBqvMnTYxZx76y7iR9YE9vJQ_3YiDpx9VtsBuy-Oj4fs5lqiKVPqTXKytP12lOwFrrRr__HxdS9aVmFdSOwX0UvVgofZJvc8GJOrBO9riGA9hoStasRx91xO8rVpQjaTjEBQcVy5ZW0KzxeDE")',
-                            }}
-                        ></div>
-                    </div>
-                </header>
-
-                {/* Content */}
-                <div className="px-40 flex flex-1 justify-center py-5">
-                    <div className="layout-content-container flex flex-col py-5 max-h-[960px] flex-1">
-                        <h2 className="text-[#0d0f1c] tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">
-                            Personalize Your Learning Journey
-                        </h2>
-                        
-                        {/* Select Hobbies */}
-                        <h3 className="text-[#0d0f1c] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
-                            Select Your Hobbies
-                        </h3>
-                        <div className="flex gap-3 p-3 flex-wrap pr-4 justify-between">
-                            {allHobbies.map((hobby, idx) => (
-                                <div key={idx} className="relative">
-                                    <button
-                                        className={`flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg pl-2 pr-4 cursor-pointer transition-colors duration-200 ${
-                                            selectedHobbies.includes(hobby.name)
-                                                ? 'bg-[#607afb] text-[#f8f9fc]'
-                                                : 'bg-[#e6e9f4] text-[#0d0f1c]'
-                                        }`}
-                                        onClick={() => handleHobbyClick(hobby.name)}
-                                    >
-                                        <div className="text-[#0d0f1c] flex items-center justify-center">
-                                            <span className="text-xl">{hobby.icon}</span>
-                                        </div>
-                                        <p className="text-sm font-medium leading-normal">{hobby.name}</p>
-                                    </button>
-                                    {hobby.isCustom && (
-                                        <button
-                                            className="absolute -top-2 -right-2 size-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs cursor-pointer"
-                                            onClick={() => handleDeleteHobby(hobby.name)}
-                                        >
-                                            &times;
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                        
-                        {/* Add Custom Hobby */}
-                        <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-                            <label className="flex flex-col min-w-40 flex-1">
-                                <div className="flex items-center">
-                                    <input
-                                        placeholder="Add a custom hobby"
-                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0d0f1c] focus:outline-0 focus:ring-0 border border-[#ced2e9] bg-[#f8f9fc] focus:border-[#ced2e9] h-14 placeholder:text-[#47569e] p-[15px] text-base font-normal leading-normal"
-                                        value={customHobby}
-                                        onChange={(e) => setCustomHobby(e.target.value)}
-                                        onKeyPress={(e) => {
-                                            if (e.key === "Enter") handleAddCustomHobby();
-                                        }}
-                                    />
-                                    <button
-                                        onClick={handleAddCustomHobby}
-                                        className="ml-2 flex-shrink-0 px-4 py-2 rounded-lg bg-[#607afb] text-[#f8f9fc] text-sm font-bold"
-                                    >
-                                        Add
-                                    </button>
-                                </div>
-                            </label>
-                        </div>
-
-                        {/* Daily Time Commitment Sliders */}
-                        <h3 className="text-[#0d0f1c] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
-                            Daily Time Commitment
-                        </h3>
-
-                        {/* Study Time */}
-                        <div className="@container">
-                            <div className="relative flex w-full flex-col items-start justify-between gap-3 p-4 @[480px]:flex-row @[480px]:items-center">
-                                <div className="flex w-full shrink-[3] items-center justify-between">
-                                    <p className="text-[#0d0f1c] text-base font-medium leading-normal">
-                                        Study Time
-                                    </p>
-                                    <p className="text-[#0d0f1c] text-sm font-normal leading-normal @[480px]:hidden">
-                                        {formatTime(studyTime)}
-                                    </p>
-                                </div>
-                                <div className="flex h-4 w-full items-center gap-4">
-                                    <div
-                                        className="flex h-1 flex-1 rounded-sm bg-[#ced2e9] cursor-pointer"
-                                        onClick={(e) => handleSliderChange(e, setStudyTime, 480)}
-                                    >
-                                        <div className="h-full rounded-sm bg-[#607afb]" style={{ width: `${(studyTime / 480) * 100}%` }}></div>
-                                        <div className="relative">
-                                            <div className="absolute -left-2 -top-1.5 size-4 rounded-full bg-[#607afb]"></div>
-                                        </div>
-                                    </div>
-                                    <p className="text-[#0d0f1c] text-sm font-normal leading-normal hidden @[480px]:block">
-                                        {formatTime(studyTime)}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Hobby Time */}
-                        <div className="@container">
-                            <div className="relative flex w-full flex-col items-start justify-between gap-3 p-4 @[480px]:flex-row @[480px]:items-center">
-                                <div className="flex w-full shrink-[3] items-center justify-between">
-                                    <p className="text-[#0d0f1c] text-base font-medium leading-normal">
-                                        Hobby Time
-                                    </p>
-                                    <p className="text-[#0d0f1c] text-sm font-normal leading-normal @[480px]:hidden">
-                                        {formatTime(hobbyTime)}
-                                    </p>
-                                </div>
-                                <div className="flex h-4 w-full items-center gap-4">
-                                    <div
-                                        className="flex h-1 flex-1 rounded-sm bg-[#ced2e9] cursor-pointer"
-                                        onClick={(e) => handleSliderChange(e, setHobbyTime, 480)}
-                                    >
-                                        <div className="h-full rounded-sm bg-[#607afb]" style={{ width: `${(hobbyTime / 480) * 100}%` }}></div>
-                                        <div className="relative">
-                                            <div className="absolute -left-2 -top-1.5 size-4 rounded-full bg-[#607afb]"></div>
-                                        </div>
-                                    </div>
-                                    <p className="text-[#0d0f1c] text-sm font-normal leading-normal hidden @[480px]:block">
-                                        {formatTime(hobbyTime)}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Breaks */}
-                        <div className="@container">
-                            <div className="relative flex w-full flex-col items-start justify-between gap-3 p-4 @[480px]:flex-row @[480px]:items-center">
-                                <div className="flex w-full shrink-[3] items-center justify-between">
-                                    <p className="text-[#0d0f1c] text-base font-medium leading-normal">
-                                        Breaks
-                                    </p>
-                                    <p className="text-[#0d0f1c] text-sm font-normal leading-normal @[480px]:hidden">
-                                        {formatTime(breakTime)}
-                                    </p>
-                                </div>
-                                <div className="flex h-4 w-full items-center gap-4">
-                                    <div
-                                        className="flex h-1 flex-1 rounded-sm bg-[#ced2e9] cursor-pointer"
-                                        onClick={(e) => handleSliderChange(e, setBreakTime, 480)}
-                                    >
-                                        <div className="h-full rounded-sm bg-[#607afb]" style={{ width: `${(breakTime / 480) * 100}%` }}></div>
-                                        <div className="relative">
-                                            <div className="absolute -left-2 -top-1.5 size-4 rounded-full bg-[#607afb]"></div>
-                                        </div>
-                                    </div>
-                                    <p className="text-[#0d0f1c] text-sm font-normal leading-normal hidden @[480px]:block">
-                                        {formatTime(breakTime)}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Complete Button */}
-                        <div className="flex px-4 py-3 justify-center">
-                            <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-[#607afb] text-[#f8f9fc] text-base font-bold leading-normal tracking-[0.015em]"
-                                onClick={handleComplete}>
-                                <span className="truncate">Complete Onboarding</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  const toggleHobby = (hobbyName) => {
+    setSelectedHobbies((prev) =>
+      prev.includes(hobbyName)
+        ? prev.filter((name) => name !== hobbyName)
+        : [...prev, hobbyName]
     );
+  };
+
+  const addCustomHobby = () => {
+    const trimmed = customHobby.trim();
+    if (!trimmed) return;
+    if (allHobbies.some((hobby) => hobby.name === trimmed)) {
+      setError("This hobby is already added.");
+      return;
+    }
+
+    setAllHobbies((prev) => [...prev, { name: trimmed, icon: "💡", isCustom: true }]);
+    setSelectedHobbies((prev) => [...prev, trimmed]);
+    setCustomHobby("");
+    setError("");
+  };
+
+  const removeCustomHobby = (hobbyName) => {
+    setAllHobbies((prev) => prev.filter((hobby) => hobby.name !== hobbyName));
+    setSelectedHobbies((prev) => prev.filter((name) => name !== hobbyName));
+  };
+
+  const handleComplete = async () => {
+    setError("");
+
+    const rawSubjects = JSON.parse(localStorage.getItem("onboard_subjects") || "[]");
+    if (!rawSubjects.length) {
+      setError("Please select at least one subject before continuing.");
+      return;
+    }
+
+    const payload = {
+      subjects: rawSubjects.map((subject) => ({
+        name: subject,
+        priority: 5,
+        level: "beginner",
+        topics: [],
+      })),
+      hobbies: selectedHobbies.map((hobby) => ({
+        name: hobby,
+        proficiency: "beginner",
+      })),
+      availability: {
+        Monday: [{ start: "09:00", end: "17:00" }],
+        Tuesday: [{ start: "09:00", end: "17:00" }],
+      },
+      preferences: {
+        study_time: studyTime,
+        hobby_time: hobbyTime,
+        break_time: breakTime,
+      },
+    };
+
+    try {
+      setIsSaving(true);
+      await apiClient.post("/user/onboard", payload);
+      localStorage.setItem("onboard_completed", "true");
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Onboarding save failed:", err);
+      setError(err.response?.data?.detail || "Unable to save your preferences. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#f8f9fc] text-[#0f172a]">
+      <div className="mx-auto w-full max-w-[760px] px-6 py-10">
+        <div className="rounded-[32px] border border-[#e6e9f4] bg-white p-8 shadow-sm">
+          <div className="mb-8 text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#64748b]">Personalize</p>
+            <h1 className="mt-2 text-3xl font-bold text-[#0f172a]">Setup your learning style</h1>
+            <p className="mx-auto mt-3 max-w-2xl text-sm text-[#475569]">
+              Choose your hobbies and daily rhythm so EveAI can create a plan that fits your life.
+            </p>
+          </div>
+
+          <div className="space-y-8">
+            <section>
+              <h2 className="text-base font-semibold text-[#0f172a]">Choose hobbies</h2>
+              <p className="mt-2 text-sm text-[#475569]">Select the activities that help you recharge outside of studying.</p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                {allHobbies.map((hobby) => {
+                  const selected = selectedHobbies.includes(hobby.name);
+                  return (
+                    <button
+                      key={hobby.name}
+                      type="button"
+                      onClick={() => toggleHobby(hobby.name)}
+                      className={`flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm transition ${
+                        selected
+                          ? "border-[#607afb] bg-[#eff6ff] text-[#0f172a]"
+                          : "border-[#d2d6e4] bg-[#f8fafc] text-[#475569]"
+                      }`}
+                    >
+                      <span>{hobby.icon}</span>
+                      <span>{hobby.name}</span>
+                      {hobby.isCustom && selected && (
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeCustomHobby(hobby.name);
+                          }}
+                          className="ml-1 cursor-pointer text-red-500"
+                        >
+                          ×
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-4 flex items-center gap-3">
+                <input
+                  type="text"
+                  placeholder="Add custom hobby"
+                  value={customHobby}
+                  onChange={(e) => setCustomHobby(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addCustomHobby()}
+                  className="w-full rounded-3xl border border-[#d2d6e4] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#607afb] focus:ring-2 focus:ring-[#dbe4ff]"
+                />
+                <button
+                  type="button"
+                  onClick={addCustomHobby}
+                  className="rounded-3xl bg-[#607afb] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#4f63df]"
+                >
+                  Add
+                </button>
+              </div>
+            </section>
+
+            <section className="grid gap-4 md:grid-cols-3">
+              {[
+                { label: "Study Time", value: studyTime, setter: setStudyTime, max: 480, hint: "Daily study goal" },
+                { label: "Hobby Time", value: hobbyTime, setter: setHobbyTime, max: 240, hint: "Relaxation minutes" },
+                { label: "Break Time", value: breakTime, setter: setBreakTime, max: 120, hint: "Daily breaks" },
+              ].map((item) => (
+                <div key={item.label} className="rounded-3xl border border-[#e6e9f4] bg-[#f8fafc] p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-[#0f172a]">{item.label}</p>
+                    <span className="text-sm text-[#475569]">{formatTime(item.value)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max={item.max}
+                    step="15"
+                    value={item.value}
+                    onChange={(e) => item.setter(Number(e.target.value))}
+                    className="mt-4 w-full accent-[#607afb]"
+                  />
+                  <p className="mt-3 text-xs text-[#64748b]">{item.hint}</p>
+                </div>
+              ))}
+            </section>
+
+            {error && (
+              <div className="rounded-3xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={handleComplete}
+                disabled={isSaving}
+                className="inline-flex w-full justify-center rounded-3xl bg-[#607afb] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#4f63df] disabled:cursor-not-allowed disabled:bg-[#a5b4fc]"
+              >
+                {isSaving ? "Saving preferences..." : "Complete Onboarding"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Personalize;

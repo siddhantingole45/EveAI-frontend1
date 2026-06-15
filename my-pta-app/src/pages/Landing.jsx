@@ -1,146 +1,163 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const Landing = () => {
-      const navigate = useNavigate();
-  
+  const navigate = useNavigate();
+
   return (
-    <div
-      className="relative flex min-h-screen flex-col bg-[#f8f9fc] group/design-root"
-      style={{ fontFamily: 'Manrope, "Noto Sans", sans-serif' }}
-    >
-      <div className="layout-container flex w-full h-full grow flex-col">
-        {/* Navbar */}
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e6e9f4] px-10 py-3">
-          <div className="flex items-center gap-4 text-[#0d0f1c]">
-            <div className="size-4">
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clipPath="url(#clip0_6_543)">
-                  <path
-                    d="M42.1739 20.1739L27.8261 5.82609C29.1366 7.13663 28.3989 10.1876 26.2002 13.7654C24.8538 15.9564 22.9595 18.3449 20.6522 20.6522C18.3449 22.9595 15.9564 24.8538 13.7654 26.2002C10.1876 28.3989 7.13663 29.1366 5.82609 27.8261L20.1739 42.1739C21.4845 43.4845 24.5355 42.7467 28.1133 40.548C30.3042 39.2016 32.6927 37.3073 35 35C37.3073 32.6927 39.2016 30.3042 40.548 28.1133C42.7467 24.5355 43.4845 21.4845 42.1739 20.1739Z"
-                    fill="currentColor"
-                  ></path>
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M7.24189 26.4066C7.31369 26.4411 7.64204 26.5637 8.52504 26.3738C9.59462 26.1438 11.0343 25.5311 12.7183 24.4963C14.7583 23.2426 17.0256 21.4503 19.238 19.238C21.4503 17.0256 23.2426 14.7583 24.4963 12.7183C25.5311 11.0343 26.1438 9.59463 26.3738 8.52504C26.5637 7.64204 26.4411 7.31369 26.4066 7.24189C26.345 7.21246 26.143 7.14535 25.6664 7.1918C24.9745 7.25925 23.9954 7.5498 22.7699 8.14278C20.3369 9.32007 17.3369 11.4915 14.4142 14.4142C11.4915 17.3369 9.32007 20.3369 8.14278 22.7699C7.5498 23.9954 7.25925 24.9745 7.1918 25.6664C7.14534 26.143 7.21246 26.345 7.24189 26.4066Z"
-                    fill="currentColor"
-                  ></path>
-                </g>
-                <defs>
-                  <clipPath id="clip0_6_543">
-                    <rect width="48" height="48" fill="white"></rect>
-                  </clipPath>
-                </defs>
-              </svg>
-            </div>
-            <h2 className="text-[#0d0f1c] text-lg font-bold leading-tight tracking-[-0.015em] ">EveAI</h2>
-          </div>
-          <div className="flex flex-1 justify-end gap-8">
-            <div className="flex items-center gap-9">
-              <a className="text-[#0d0f1c] text-sm font-medium leading-normal" href="#">Home</a>
-              <a className="text-[#0d0f1c] text-sm font-medium leading-normal" href="#">Features</a>
-              <a className="text-[#0d0f1c] text-sm font-medium leading-normal" href="#">Pricing</a>
-              <a className="text-[#0d0f1c] text-sm font-medium leading-normal" href="#">Contact</a>
-            </div>
-            <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#607afb] text-[#f8f9fc] text-sm font-bold leading-normal tracking-[0.015em]" onClick={() => navigate("/signup")}>
-              <span className="truncate">Get Started</span>
+    <div className="min-h-screen bg-[#f8f9fc] text-[#0f172a]">
+      <div className="mx-auto max-w-[1400px] px-6 py-6">
+        <header className="mb-10 flex flex-col gap-4 border-b border-[#e6e9f4] pb-5 md:flex-row md:items-center md:justify-between">
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="flex items-center gap-3 text-lg font-bold text-[#0f172a]"
+          >
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#607afb] text-white">
+              E
+            </span>
+            EveAI
+          </button>
+
+          <nav className="flex flex-wrap items-center gap-4 text-sm text-[#475569]">
+            <a href="#features" className="transition hover:text-[#1d4ed8]">
+              Features
+            </a>
+            <a href="#how-it-works" className="transition hover:text-[#1d4ed8]">
+              How it works
+            </a>
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="rounded-full border border-[#d2d6e4] px-4 py-2 text-sm font-semibold transition hover:border-[#607afb] hover:text-[#1d4ed8]"
+            >
+              Log in
             </button>
-          </div>
+          </nav>
         </header>
 
-        {/* Hero Section */}
-        <div className="px-40 flex flex-1 justify-center py-5">
-          <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-            <div className="@container">
-              <div className="@[480px]:p-4">
-                <div
-                  className="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-lg items-center justify-center p-4"
-                  style={{
-                    backgroundImage:
-                      'linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDvim9cQTNlczDM8ncTO8_KKjLp9_MSCpq5R8jgrybQ9PXjLJ_GSTU9-3rvlvrJlTNiPFzCiiEXNO3G-I_nxS4SnBmEKQ-oqd1ZlSTnI-OYDHfKgIl2SCO9fTy7iVKFI0S5azMHOasndwmLWIAsPotOnESHe3EUQ3ILd6sSOdLGNkMvYEvk7EEArVCeT50SpFEGLSSeQT7HVcK_6JsHtztkF5ScIjO2qNK5ye1wzQmmxGQ97CKc9DjusRlKGj_wp8i6UpkgSjsEO1gK")',
-                  }}
-                >
-                  <div className="flex flex-col gap-2 text-center">
-                    <h1 className="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">
-                      Your Personalized Learning Companion
-                    </h1>
-                    <h2 className="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
-                      EduAssist adapts to your learning style, providing tailored support and resources to help you achieve your academic goals.
-                    </h2>
-                  </div>
-                  <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#607afb] text-[#f8f9fc] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]" onClick={() => navigate("/signup")}>
-                    <span className="truncate ">Get Started</span>
-                  </button>
-                </div>
-              </div>
+        <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div className="space-y-6">
+            <span className="inline-flex rounded-full bg-[#eef2ff] px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-[#1d4ed8]">
+              Study smarter with AI
+            </span>
+            <h1 className="max-w-3xl text-4xl font-black tracking-tight sm:text-5xl">
+              Personalized learning, faster progress, and tutor support in one app.
+            </h1>
+            <p className="max-w-2xl text-base leading-7 text-[#475569] sm:text-lg">
+              EveAI turns planning, notes, practice, and tutor chat into one consistent learning routine.
+            </p>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => navigate("/signup")}
+                className="inline-flex items-center justify-center rounded-full bg-[#607afb] px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-[#4f63df]"
+              >
+                Start free
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/login")}
+                className="inline-flex items-center justify-center rounded-full border border-[#d2d6e4] px-6 py-3 text-sm font-semibold text-[#0f172a] transition hover:border-[#607afb] hover:text-[#1d4ed8]"
+              >
+                Log in
+              </button>
             </div>
 
-            {/* Features Section */}
-            <div className="flex flex-col gap-10 px-4 py-10 @container text-center">
-              <div className="flex flex-col text-center gap-4 ">
-                <h1 className="text-[#0d0f1c] tracking-light text-[32px] font-bold leading-tight @[480px]:text-4xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] max-w-[720px] mx-auto">
-                  Key Features
-                </h1>
-                <p className="text-[#0d0f1c] text-base font-normal leading-normal max-w-[720px] mx-auto">
-                  EduAssist offers a range of features designed to enhance your learning experience.
-                </p>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-3xl border border-[#e6e9f4] bg-white p-5 shadow-sm">
+                <p className="text-sm font-semibold">AI Tutoring</p>
+                <p className="mt-2 text-sm text-[#475569]">Ask questions and get clear explanations anytime.</p>
               </div>
-
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-0">
-                {/* Feature 1 */}
-                <div className="flex flex-1 gap-3 rounded-lg border border-[#ced2e9] bg-[#f8f9fc] p-4 flex-col">
-                  <div className="text-[#0d0f1c]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                      <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152..." />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <h2 className="text-[#0d0f1c] text-base font-bold leading-tight">Personalized Learning Paths</h2>
-                    <p className="text-[#47569e] text-sm font-normal leading-normal">
-                      Receive customized study plans and resources based on your strengths and weaknesses.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Feature 2 */}
-                <div className="flex flex-1 gap-3 rounded-lg border border-[#ced2e9] bg-[#f8f9fc] p-4 flex-col">
-                  <div className="text-[#0d0f1c]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                      <path d="M216,40H136V24a8,8,0,0,0-16,0V40H40..." />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <h2 className="text-[#0d0f1c] text-base font-bold leading-tight">Progress Tracking</h2>
-                    <p className="text-[#47569e] text-sm font-normal leading-normal">
-                      Monitor your progress with detailed analytics and insights into your learning journey.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Feature 3 */}
-                <div className="flex flex-1 gap-3 rounded-lg border border-[#ced2e9] bg-[#f8f9fc] p-4 flex-col">
-                  <div className="text-[#0d0f1c]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                      <path d="M244.8,150.4a8,8,0,0,1-11.2-1.6A51.6,51.6,0,0,0,192..." />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <h2 className="text-[#0d0f1c] text-base font-bold leading-tight">Collaborative Study Groups</h2>
-                    <p className="text-[#47569e] text-sm font-normal leading-normal">
-                      Connect with peers and form study groups to learn together and share knowledge.
-                    </p>
-                  </div>
-                </div>
+              <div className="rounded-3xl border border-[#e6e9f4] bg-white p-5 shadow-sm">
+                <p className="text-sm font-semibold">Goal-driven plans</p>
+                <p className="mt-2 text-sm text-[#475569]">Create schedules and study routines tailored to your subjects.</p>
+              </div>
+              <div className="rounded-3xl border border-[#e6e9f4] bg-white p-5 shadow-sm">
+                <p className="text-sm font-semibold">Notes & review</p>
+                <p className="mt-2 text-sm text-[#475569]">Keep notes and practice quizzes together in one place.</p>
               </div>
             </div>
-
-            <h2 className="text-[#0d0f1c] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-              EveAI
-            </h2>
           </div>
-        </div>
+
+          <div className="rounded-[28px] bg-gradient-to-br from-[#eef2ff] via-[#eef4ff] to-[#ffffff] p-6 shadow-lg">
+            <div className="rounded-[24px] bg-white p-8 shadow-sm">
+              <div className="flex items-center justify-between gap-4 border-b border-[#e6e9f4] pb-4">
+                <div>
+                  <p className="text-sm font-semibold text-[#1d4ed8]">EveAI Tutor</p>
+                  <p className="mt-2 text-sm text-[#475569]">Ask anything and stay on track.</p>
+                </div>
+                <span className="rounded-2xl bg-[#eff6ff] px-3 py-1 text-xs font-semibold text-[#2563eb]">Live</span>
+              </div>
+
+              <div className="mt-6 space-y-4">
+                <div className="rounded-3xl bg-[#f8fafc] p-4 text-sm text-[#111827] shadow-sm">
+                  <p className="font-semibold">Eve</p>
+                  <p className="mt-2 text-sm text-[#475569]">Hi! What do you want help learning today?</p>
+                </div>
+                <div className="rounded-3xl bg-[#eff6ff] p-4 text-sm text-[#0f172a]">
+                  <p className="font-semibold">You</p>
+                  <p className="mt-2 text-sm text-[#475569]">Help me practice faster and stay more organized.</p>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-3">
+                <div className="rounded-3xl bg-[#0f172a] px-4 py-3 text-sm text-white">Personalized plans</div>
+                <div className="rounded-3xl bg-[#1d4ed8] px-4 py-3 text-sm text-white">Instant tutor chat</div>
+                <div className="rounded-3xl bg-[#2563eb] px-4 py-3 text-sm text-white">Weekly practice routines</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="features" className="space-y-8 py-12">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#64748b]">Key features</p>
+            <h2 className="mt-4 text-3xl font-bold sm:text-4xl">Build better habits with one learning companion.</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-base text-[#475569]">
+              From smart study sessions to helpful AI review, EveAI makes every study moment count.
+            </p>
+          </div>
+          <div className="grid gap-5 lg:grid-cols-3">
+            <div className="rounded-3xl border border-[#e6e9f4] bg-white p-8 shadow-sm">
+              <p className="text-2xl font-bold">01</p>
+              <h3 className="mt-4 text-xl font-semibold">Study plans that follow you</h3>
+              <p className="mt-3 text-sm text-[#475569]">Stay organized with daily routines and subject-specific goals.</p>
+            </div>
+            <div className="rounded-3xl border border-[#e6e9f4] bg-white p-8 shadow-sm">
+              <p className="text-2xl font-bold">02</p>
+              <h3 className="mt-4 text-xl font-semibold">Ask the tutor anytime</h3>
+              <p className="mt-3 text-sm text-[#475569]">Get instant explanations, examples, and study support.</p>
+            </div>
+            <div className="rounded-3xl border border-[#e6e9f4] bg-white p-8 shadow-sm">
+              <p className="text-2xl font-bold">03</p>
+              <h3 className="mt-4 text-xl font-semibold">Track your progress</h3>
+              <p className="mt-3 text-sm text-[#475569]">See how your study habits improve week by week.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="how-it-works" className="rounded-[32px] border border-[#e6e9f4] bg-white p-8 shadow-sm">
+          <div className="grid gap-6 lg:grid-cols-4">
+            <div className="space-y-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#64748b]">How it works</p>
+              <h2 className="text-3xl font-bold">Get started in three easy steps.</h2>
+            </div>
+            <div className="space-y-4 rounded-3xl bg-[#f8fafc] p-6">
+              <p className="text-lg font-semibold">1. Sign up</p>
+              <p className="text-sm text-[#475569]">Create an account and start with a short onboarding flow.</p>
+            </div>
+            <div className="space-y-4 rounded-3xl bg-[#f8fafc] p-6">
+              <p className="text-lg font-semibold">2. Personalize</p>
+              <p className="text-sm text-[#475569]">Choose your subjects, hobbies, and daily study rhythm.</p>
+            </div>
+            <div className="space-y-4 rounded-3xl bg-[#f8fafc] p-6">
+              <p className="text-lg font-semibold">3. Learn with AI</p>
+              <p className="text-sm text-[#475569]">Use the assistant, notes, schedule, and quizzes to grow every day.</p>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
